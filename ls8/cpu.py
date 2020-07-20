@@ -3,8 +3,39 @@
 import sys
 
 HLT = 0b00000001
-LDI = 0b10000010
-PRN = 0b01000111
+LDI = 0b10000010  # two params
+PRN = 0b01000111  # one param
+ADD = 0b10100000  # two params
+AND = 0b10101000  # two params
+CALL = 0b01010000  # one param
+CMP = 0b10100111  # two params
+DEC = 0b01100110  # one param
+DIV = 0b10100011  # two params
+INC = 0b01100101  # one param
+INT = 0b01010010  # one param
+IRET = 0b00010011
+JEQ = 0b01010101  # one param
+JGE = 0b01011010  # one param
+JGT = 0b01010111  # one param
+JLE = 0b01011001  # one param
+JLT = 0b01011000  # one param
+JMP = 0b01010100  # one param
+JNE = 0b01010110  # one param
+LD = 0b10000011  # two params
+MOD = 0b10100100  # two params
+MUL = 0b10100010  # two params
+NOP = 0b00000000
+NOT = 0b01101001  # one param
+OR = 0b10101010  # two params
+POP = 0b01000110  # one param
+PRA = 0b01001000  # one param
+PUSH = 0b01000101  # one param
+RET = 0b00010001
+SHL = 0b10101100  # two params
+SHR = 0b10101101  # two params
+ST = 0b10000100  # two params
+SUB = 0b10100001  # two params
+XOR = 0b10101011  # two params
 
 
 class CPU:
@@ -29,10 +60,10 @@ class CPU:
         program = [
             # From print8.ls8
             0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
+            0b00000000,  # A value
+            0b00001000,  # B value
             0b01000111,  # PRN R0
-            0b00000000,
+            0b00000000,  # A value
             0b00000001,  # HLT
         ]
 
