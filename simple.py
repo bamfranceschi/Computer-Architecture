@@ -1,3 +1,4 @@
+import sys
 PRINT_ANNA = 0b01  # 1
 HALT = 0b10  # 2
 PRINT_NUM = 0b11  # command 3
@@ -5,11 +6,44 @@ SAVE = 0b100
 PRINT_REG = 0b101
 ADD = 0b110
 
-#registers[2] = registers[2] + registers[3]
+
+# registers[2] = registers[2] + registers[3]
 
 
-memory = [PRINT_ANNA, PRINT_ANNA, PRINT_ANNA,
-          PRINT_NUM, 42, SAVE, 2, 99, SAVE, 3, 1, ADD, 2, 3, PRINT_REG, 2, HALT]  # represents RAM
+# memory = [PRINT_ANNA, PRINT_ANNA, PRINT_ANNA,
+#           PRINT_NUM, 42, SAVE, 2, 99, SAVE, 3, 1, ADD, 2, 3, PRINT_REG, 2, HALT]  # represents RAM
+
+memory = [0] * 256  # load up program into this memory
+
+
+def load_memory(file_name):
+
+    try:
+        address = 0
+        with open(file_name) as file:
+            for line in file:
+                split_line = line.split('#')
+                command = split_line[0].strip()
+
+                if command == '':
+                    continue
+
+                # load them up as int(command, 2) into our program (makes into a number identifying original command is in binary format)
+                instruction = int(command, 2)
+                memory[address] = instruction
+                address += 1
+     except FileNotFoundError:
+        print("oops, that ifle doesn't exist")
+        sys.exit()
+
+if len(sys.argv) < 2:
+    print("you need to give a second file name")
+    sys.exit()
+
+
+
+file_name = sys.argv[1]
+load_memory(file_name)
 
 # write a program to pull each command ot of memory and execute
 
@@ -34,9 +68,9 @@ while running:
     if command == SAVE:
         registers[memory[program_counter + 1]] = memory[program_counter + 2]
         program_counter += 2
-        #reg = memory[pc + 1]
-        #num_to_save = memory[pc + 2]
-        #registers[reg] = num_to_save
+        # reg = memory[pc + 1]
+        # num_to_save = memory[pc + 2]
+        # registers[reg] = num_to_save
     if command == PRINT_REG:
         print(registers[memory[program_counter + 1]])
         program_counter += 1
