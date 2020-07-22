@@ -5,6 +5,8 @@ PRINT_NUM = 0b11  # command 3
 SAVE = 0b100
 PRINT_REG = 0b101
 ADD = 0b110
+PUSH = 0b111
+POP = 0b1000
 
 
 # registers[2] = registers[2] + registers[3]
@@ -55,6 +57,7 @@ load_memory(file_name)
 registers = [0] * 8
 
 program_counter = 0
+registers[7] = 0xF4
 running = True
 
 while running:
@@ -84,5 +87,34 @@ while running:
 
     if command == HALT:
         running = False
+    
+    if command == PUSH:
+        # decrement stack pointer
+        registers[7] -=1
+
+        # get a value from the given register
+        value = registers[memory[program_counter + 1]] 
+        
+        # put at the stack pointer address
+
+        sp = registers[7]
+        memory[sp] = value
+
+        program_counter += 1
+    
+    if command == POP:
+        # get the stack pointer (where do we look?)
+        sp = registers[7]
+
+        # get register number to put value in
+        reg = memory[program_counter + 1]
+        value = memory[sp] 
+
+        # use stack pointer to get the value
+        registers[reg] = value
+        # put the value into the given register
+        registers[7] +=1
+
+        program_counter +=1
 
     program_counter += 1

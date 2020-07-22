@@ -45,11 +45,14 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.reg[7] = 0xF4
         self.pc = 0
         self.branchtable = {}
         self.branchtable[LDI] = self.handle_ldi
         self.branchtable[PRN] = self.handle_prn
         self.branchtable[MUL] = self.handle_mul
+        self.branchtable[PUSH] = self.handle_push
+        self.branchtable[POP] = self.handle_pop
 
     def handle_ldi(self, a, b):
         self.reg[a] = b
@@ -62,6 +65,26 @@ class CPU:
     def handle_mul(self, a, b):
         self.alu("MUL", a, b)
         self.pc += 2
+
+    def handle_push(self, a):
+        self.reg[7] -= 1
+        value = self.reg[a]
+
+        sp = self.reg[7]
+        self.ram[sp] = value
+
+        self.pc += 1
+
+    def handle_pop(self, a):
+        sp = self.reg[7]
+
+        # register = self.ram[self.pc + 1]
+        value = self.ram[sp]
+
+        self.reg[a] = value
+        self.reg[7] += 1
+
+        self.pc += 1
 
     def load(self, file_name):
         """Load a program into memory."""
@@ -82,6 +105,7 @@ class CPU:
         except FileNotFoundError:
             print("oops, that file doesn't exist")
             sys.exit()
+        print(self.ram)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -135,6 +159,8 @@ class CPU:
                 running = False
 
             self.pc += 1
+        print(self.ram)
+        print(self.reg)
 
     def ram_read(self, address):
         # should accept the address to read and return the value stored there.
