@@ -53,18 +53,25 @@ class CPU:
         self.branchtable[MUL] = self.handle_mul
         self.branchtable[PUSH] = self.handle_push
         self.branchtable[POP] = self.handle_pop
+        self.branchtable[CALL] = self.handle_call
+        self.branchtable[RET] = self.handle_ret
+        self.branchtable[ADD] = self.handle_add
 
     def handle_ldi(self, a, b):
         self.reg[a] = b
-        self.pc += 2
+        self.pc += 3
 
     def handle_prn(self, a):
         print(self.reg[a])
-        self.pc += 1
+        self.pc += 2
 
     def handle_mul(self, a, b):
         self.alu("MUL", a, b)
-        self.pc += 2
+        self.pc += 3
+
+    def handle_add(self, a, b):
+        self.alu("ADD", a, b)
+        self.pc += 3
 
     def handle_push(self, a):
         self.reg[7] -= 1
@@ -73,7 +80,7 @@ class CPU:
         sp = self.reg[7]
         self.ram[sp] = value
 
-        self.pc += 1
+        self.pc += 2
 
     def handle_pop(self, a):
         sp = self.reg[7]
@@ -84,7 +91,30 @@ class CPU:
         self.reg[a] = value
         self.reg[7] += 1
 
-        self.pc += 1
+        self.pc += 2
+
+    def handle_call(self, a):
+
+        address = self.reg[a]
+
+        return_address = self.pc + 2
+
+        self.reg[7] -= 1
+        sp = self.reg[7]
+
+        self.ram[sp] = return_address
+
+        self.pc = address
+
+    def handle_ret(self):
+
+        sp = self.reg[7]
+
+        return_address = self.ram[sp]
+
+        self.reg[7] += 1
+
+        self.pc = return_address
 
     def load(self, file_name):
         """Load a program into memory."""
@@ -105,7 +135,6 @@ class CPU:
         except FileNotFoundError:
             print("oops, that file doesn't exist")
             sys.exit()
-        print(self.ram)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -158,9 +187,8 @@ class CPU:
             if IR == HLT:
                 running = False
 
-            self.pc += 1
-        print(self.ram)
-        print(self.reg)
+            if IR == RET:
+                self.branchtable[IR]()
 
     def ram_read(self, address):
         # should accept the address to read and return the value stored there.
