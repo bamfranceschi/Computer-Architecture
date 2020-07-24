@@ -9,31 +9,18 @@ ADD = 0b10100000  # two params
 AND = 0b10101000  # two params
 CALL = 0b01010000  # one param
 CMP = 0b10100111  # two params
-DEC = 0b01100110  # one param
-DIV = 0b10100011  # two params
-INC = 0b01100101  # one param
-INT = 0b01010010  # one param
-IRET = 0b00010011
 JEQ = 0b01010101  # one param
-JGE = 0b01011010  # one param
-JGT = 0b01010111  # one param
-JLE = 0b01011001  # one param
-JLT = 0b01011000  # one param
 JMP = 0b01010100  # one param
 JNE = 0b01010110  # one param
-LD = 0b10000011  # two params
 MOD = 0b10100100  # two params
 MUL = 0b10100010  # two params
-NOP = 0b00000000
 NOT = 0b01101001  # one param
 OR = 0b10101010  # two params
 POP = 0b01000110  # one param
-PRA = 0b01001000  # one param
 PUSH = 0b01000101  # one param
 RET = 0b00010001
 SHL = 0b10101100  # two params
 SHR = 0b10101101  # two params
-ST = 0b10000100  # two params
 SUB = 0b10100001  # two params
 XOR = 0b10101011  # two params
 
@@ -47,6 +34,7 @@ class CPU:
         self.reg = [0] * 8
         self.reg[7] = 0xF4
         self.pc = 0
+        self.flag_E = 0
         self.branchtable = {}
         self.branchtable[LDI] = self.handle_ldi
         self.branchtable[PRN] = self.handle_prn
@@ -56,6 +44,10 @@ class CPU:
         self.branchtable[CALL] = self.handle_call
         self.branchtable[RET] = self.handle_ret
         self.branchtable[ADD] = self.handle_add
+        self.branchtable[CMP] = self.handle_cmp
+        self.branchtable[JMP] = self.handle_jmp
+        self.branchtable[JEQ] = self.handle_jeq
+        self.branchtable[JNE] = self.handle_jne
 
     def handle_ldi(self, a, b):
         self.reg[a] = b
@@ -73,47 +65,54 @@ class CPU:
         self.alu("ADD", a, b)
         self.pc += 3
 
+    def handle_cmp(self, a, b):
+        self.alu("CMP", a, b)
+        self.pc += 3
+
+    def handle_jmp(self, a):
+        address = self.reg[a]
+        self.pc = address
+
+    def handle_jeq(self, a):
+        if self.flag_E == 1:
+            self.pc = self.reg[a]
+        else:
+            self.pc += 2
+
+    def handle_jne(self, a):
+
+        if self.flag_E == 0:
+            self.pc = self.reg[a]
+        else:
+            self.pc += 2
+
     def handle_push(self, a):
         self.reg[7] -= 1
         value = self.reg[a]
-
         sp = self.reg[7]
         self.ram[sp] = value
-
         self.pc += 2
 
     def handle_pop(self, a):
         sp = self.reg[7]
-
         # register = self.ram[self.pc + 1]
         value = self.ram[sp]
-
         self.reg[a] = value
         self.reg[7] += 1
-
         self.pc += 2
 
     def handle_call(self, a):
-
         address = self.reg[a]
-
         return_address = self.pc + 2
-
         self.reg[7] -= 1
         sp = self.reg[7]
-
         self.ram[sp] = return_address
-
         self.pc = address
 
     def handle_ret(self):
-
         sp = self.reg[7]
-
         return_address = self.ram[sp]
-
         self.reg[7] += 1
-
         self.pc = return_address
 
     def load(self, file_name):
@@ -144,6 +143,17 @@ class CPU:
         # elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+
+        elif op == "CMP":
+            value_a = self.reg[reg_a]
+
+            value_b = self.reg[reg_b]
+
+            if value_a == value_b:
+                self.flag_E = 1
+            else:
+                self.flag_E = 0
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -188,7 +198,7 @@ class CPU:
                 running = False
 
             if IR == RET:
-                self.branchtable[IR]()
+                self.branchtable[IR]
 
     def ram_read(self, address):
         # should accept the address to read and return the value stored there.
