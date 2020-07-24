@@ -1,0 +1,96 @@
+
+AND, OR, NOT, XOR
+
+Operation                       Boolean Operator                        Bitwise Operator
+AND                                 && (and)                                    &
+OR                                  || (or)                                     |
+NOT                                 !  (not)                                    ~
+XOR                                  none!                                      ^
+
+
+    0b1010101
+&   0b1000101
+-------------
+    0b1000101
+
+    0b0011100
+&   0b1010101
+-------------
+    0b0010100
+
+    0b1010101
+|   0b1000101
+-------------
+    0b1010101
+
+    0b0011100
+|   0b1010101
+-------------
+    0b1011101
+
+    0b1010101
+^   0b1000101
+-------------
+    0b0010000
+
+    0b0011100
+^   0b1010101
+-------------
+    0b1001001
+
+Shifting
+
+right shifting
+
+0b1010101 >> 1
+becomes 0b101010 or 0b0101010 deleted the last 1, can add zero at the front to keep same length of bin num
+0b1010101 >> 2
+becomes 0b10101 or 0b0010101
+0b1010101 >> 3
+becomes 0b1010 or 0b0000101
+
+left shifting
+
+0b1010101 << 1
+becomes 0b10101010, add extra zero to end
+
+0b1010101 << 2
+becomes 0b101010100, add 2 extra zeros to the end 
+
+what if we want to isolate 2 bits in the middle of a bin num?
+
+    VV
+0b1010101
+
+shift it right 3 times
+
+0b1010
+
+and then mask it by using AND
+
+    1010
+&   0011
+---------
+    0010 <--we get back the two bits we care about, with two zeros attached to the front
+
+
+
+this will then increment correctly for you, depending on what the shifted value in each command is (1 or 2)
+pc += 1 + (command >> 6)
+
+
+with open("print8.ls8") as file:
+    for line in file:
+        split_line = line.split('#')
+        command = split_line[0].strip()
+
+        if command == '':
+            continue
+        
+        # load them up as int(command, 2) into our program (makes into a number identifying original command is in binary format)
+        num = int(command, 2)
+import sys
+
+print(sys.argv)
+
+file_name = sys.argv[1]

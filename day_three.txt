@@ -1,0 +1,24 @@
+Where to store variables if we have too many for the register?
+
+stack: push, pop, storage
+
+RAM == memory
+
+registers, caches, RAM, hard drive
+
+memory: a way to store info and get it back
+
+memory stack:
+FF: 00 (255) ff is hexidecimal
+...
+F4: 00 <-- SP (stack pointer), decrement after pushing onto stack
+...
+04:
+03:
+02:
+01:
+00: loaded commands storage starts here
+
+to pop, return current value at SP and just move pointer up. we'll overwrite the old data next push
+
+read more about stack underflow and stack overflow
